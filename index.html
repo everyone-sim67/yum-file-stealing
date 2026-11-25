@@ -87,12 +87,15 @@ html, body {
     transition: width .25s ease;
 }
 #hudfiles {
-    margin-top: 5px;
-    color: #8fa07d;
+    margin-top: 6px;
+    color: #c7d6b5;
     font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 42vh;
+    overflow: auto;
+    user-select: text;
 }
 #assets {
     position: absolute;
@@ -225,11 +228,17 @@ html, body {
         console[kind] = function () {
             try {
                 var text = Array.prototype.map.call(arguments, function (item) {
-                    return item instanceof Error ? (item.message || String(item)) : String(item);
-                }).join(" ").replace(/\s+/g, " ").trim();
-                if (text && text.length < 900 && !consoleNoise.test(text) && text.indexOf("Rain World") !== 0) {
-                    consoleTail.push((kind === "error" ? "! " : "") + text);
+                    if (item instanceof Error) return item.stack || item.message || String(item);
+                    if (item && typeof item === "object") {
+                        if (item.stack) return String(item.stack);
+                        try { return JSON.stringify(item); } catch (e) { return String(item); }
+                    }
+                    return String(item);
+                }).join(" ").trim();
+                if (text && !consoleNoise.test(text) && text.indexOf("Rain World") !== 0) {
+                    consoleTail.push((kind === "error" ? "! " : "") + text.slice(0, 3000));
                     if (consoleTail.length > 12) consoleTail.shift();
+                    hudFiles.textContent = consoleTail.join("\\n\\n");
                 }
             } catch (error) { /* a failing mirror must never break the game */ }
             return original.apply(null, arguments);
@@ -649,13 +658,12 @@ html, body {
                     lastIdleReport = Date.now();
                     var logs = [];
                     try { logs = files.scanLogs ? files.scanLogs() : []; } catch (error) { logs = []; }
-                    var line = consoleTail.length ? consoleTail[consoleTail.length - 1] : "";
-                    var extra = consoleTail.length > 1 ? consoleTail[consoleTail.length - 2] : "";
+                    var diagnostics = consoleTail.length ? consoleTail.join("\\n\\n") :
+                        (logs.length ? logs.slice(-12).join("\\n") : "nothing was logged");
                     hudShow(hudFillPercent || 0,
-                        "engine quiet " + Math.round(idle / 1000) + "s \u00b7 " +
-                            (consoleTail.length ? consoleTail.length + " console lines" : "silent"),
-                        line || (logs.length ? logs[logs.length - 1] : "nothing was logged") +
-                            (line && extra ? "  \u2190 " + extra.slice(-120) : ""));
+                        "engine quiet " + Math.round(idle / 1000) + "s · " +
+                            (consoleTail.length ? consoleTail.length + " captured console entries" : "silent"),
+                        diagnostics);
                 }
             }
             setTimeout(tick, 400);
