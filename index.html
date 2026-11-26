@@ -520,7 +520,7 @@ html, body {
         // file cannot stall the load.
         // The 745 files the asset branch never carried live in this repo, under a
         // folder the .gitignore does not exclude, so they are tried first.
-        var fallbacks = [window.location.origin + "/yum-file-stealing/assets-extra"];
+        var fallbacks = [new URL("assets-extra/", document.baseURI).href];
         ASSET_BASES.forEach(function (base) {
             var candidate = base + ASSETS_PATH;
             if (candidate !== assetsUrl && fallbacks.indexOf(candidate) < 0) fallbacks.push(candidate);
