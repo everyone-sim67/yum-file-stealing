@@ -658,8 +658,9 @@ html, body {
                     lastIdleReport = Date.now();
                     var logs = [];
                     try { logs = files.scanLogs ? files.scanLogs() : []; } catch (error) { logs = []; }
-                    var diagnostics = consoleTail.length ? consoleTail.join("\\n\\n") :
-                        (logs.length ? logs.slice(-12).join("\\n") : "nothing was logged");
+                    var diagnostics = (logs.length ? "SAVED GAME LOGS:\\n" + logs.slice(-12).join("\\n\\n") + "\\n\\n" : "") +
+                        (consoleTail.length ? "BROWSER / UNITY CONSOLE:\\n" + consoleTail.join("\\n\\n") : "") ||
+                        "No saved exception log or console output was captured.";
                     hudShow(hudFillPercent || 0,
                         "engine quiet " + Math.round(idle / 1000) + "s · " +
                             (consoleTail.length ? consoleTail.length + " captured console entries" : "silent"),
