@@ -168,7 +168,7 @@ html, body {
 
     var BUILD = "Build/WebGLUnity6Build";
     // Bumped when Build/ changes, so a fix is not served from a stale cache.
-    var BUILD_VERSION = "2026-11-25d";
+    var BUILD_VERSION = "2026-11-25e";
     var ASSETS_PATH = "StreamingAssets";
     // Where the asset tree can also live if it is too big for Pages. selcdn and
     // jsDelivr were tried here and both refuse a tree this size, so the raw
@@ -539,9 +539,9 @@ html, body {
                 frameworkUrl: buildBase + BUILD + ".framework.js?v=" + BUILD_VERSION,
                 codeUrl: buildBase + BUILD + ".wasm?v=" + BUILD_VERSION,
                 streamingAssetsUrl: assetsUrl,
-                companyName: "Videocult",
+                companyName: "Unknown",
                 productName: "Rain World",
-                productVersion: "1.11.8",
+                productVersion: "1.0",
                 showBanner: function (message, kind) {
                     if (kind === "error") showBanner("Rain World error", message, "");
                     else nativeError(message);
